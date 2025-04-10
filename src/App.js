@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Login from './page/Login'
+
+import { Accounts, Customers, DashboardLayout, OrdersPage } from './page'
+
+import ProtectedRoute from './components/ProtectedRoute' // tùy nơi bạn lưu
 
 function App() {
+  const storedUser = localStorage.getItem('user')
+  const user = storedUser ? JSON.parse(storedUser) : null
+  const allowedPaths = user?.listMenu.map((menu) => menu.menuUrl) ?? []
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route element={<ProtectedRoute allowedPaths={allowedPaths} />}>
+            <Route path="accounts" element={<Accounts />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="orders" element={<OrdersPage />} />
+          </Route>
+
+          {/* Thêm route menu khác ở đây */}
+        </Route>
+      </Routes>
+    </Router>
+  )
 }
 
-export default App;
+export default App
