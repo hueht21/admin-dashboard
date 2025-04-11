@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 import {
   Box,
@@ -15,12 +16,8 @@ import {
 const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+
   const [loading, setLoading] = useState(false)
-  const [validationErrors, setValidationErrors] = useState({
-    username: '',
-    password: '',
-  })
 
   const navigate = useNavigate()
 
@@ -37,14 +34,12 @@ const Login = () => {
       errors.password = 'Vui lòng nhập mật khẩu'
       valid = false
     }
-    setValidationErrors(errors)
     return valid
   }
 
-  const handleSubmit = async (e) => {
-    // Reset error trước mỗi lần submit
-    setError('')
+  const { login } = useAuth()
 
+  const handleSubmit = async (e) => {
     // Validate input, nếu không hợp lệ thì không gọi API
     if (!validate()) return
     setLoading(true) // Bật loading trước khi gọi API
@@ -54,11 +49,7 @@ const Login = () => {
         password,
       })
 
-      // Giả sử API trả về token trong response.data.token
-      const { token } = response.data
-      // Lưu token vào localStorage hoặc state quản lý auth của bạn
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(response.data.data.user))
+      login(response.data.data.user)
 
       // Chuyển hướng tới dashboard hoặc trang chính của ứng dụng
       console.log('ddanwg nhap thanh cong')

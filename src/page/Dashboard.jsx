@@ -20,6 +20,8 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 import Divider from '@mui/material/Divider'
 
+import { useAuth } from '../context/AuthContext'
+
 const drawerWidth = 240
 
 const DashboardLayout = () => {
@@ -41,9 +43,9 @@ const DashboardLayout = () => {
     }
   }, [user, navigate])
 
+  const { logout } = useAuth()
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     navigate('/login')
   }
 
