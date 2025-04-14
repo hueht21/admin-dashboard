@@ -1,11 +1,3 @@
-// import React from 'react'
-
-// const MenuPage = () => {
-//   return <div>Quản lý menu</div>
-// }
-
-// export default MenuPage
-
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 // import { useNavigate } from 'react-router-dom'
@@ -15,65 +7,24 @@ import {
   Divider,
   Paper,
   CircularProgress,
-  Button,
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import DialogThemMenu from '../page/dialog/DialogThemMenu'
 
-const MenuPage = () => {
-  const [menu, setMenu] = useState([])
+const UserManagerPage = () => {
+  const [user, setUser] = useState([])
   const [loading, setLoading] = useState(true)
-  // const navigate = useNavigate()
-
-  const [open, setOpen] = useState(false)
-
-  const handleOpenDialog = () => setOpen(true)
-  const handleCloseDialog = () => setOpen(false)
-
-  const handleAddMenu = async (menu) => {
-    // console.log('Thêm menu:', menuData)
-    setLoading(true) // Bật loading trước khi gọi API
-    try {
-      const user = JSON.parse(localStorage.getItem('user'))
-      const userId = user?.id
-
-      const response = await axios.post(
-        'http://localhost:8080/api/menus/save-menu',
-        {
-          nameMenu: menu.menuName,
-          linkUri: menu.menuUrl,
-          userCreate: userId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      )
-
-      if (response.data.status) {
-        fetchMenus()
-      }
-    } catch (error) {
-      console.error('Lỗi khi lấy danh sách menu:', error)
-    } finally {
-      setLoading(false)
-    }
-
-    handleCloseDialog()
-  }
 
   useEffect(() => {
-    fetchMenus()
+    fetchUser()
   }, [])
 
-  const fetchMenus = async () => {
+  const fetchUser = async () => {
     const token = localStorage.getItem('token')
     try {
       const response = await axios.get(
-        'http://localhost:8080/api/menus/get-all-menus',
+        'http://localhost:8080/api/v1/user/getAllUser',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -81,7 +32,7 @@ const MenuPage = () => {
         }
       )
       if (response.data.status) {
-        setMenu(response.data.data)
+        setUser(response.data.data)
       }
     } catch (error) {
       console.error('Lỗi khi lấy danh sách menu:', error)
@@ -92,34 +43,71 @@ const MenuPage = () => {
 
   const columns = [
     {
-      field: 'idMenu',
+      field: 'id',
       headerName: 'ID',
       width: 100,
+      align: 'center',
+      headerAlign: 'center',
     },
     {
-      field: 'menuName',
-      headerName: 'Mô tả menu',
+      field: 'userName',
+      headerName: 'Tên đăng nhập',
       width: 250,
+      align: 'center',
+      headerAlign: 'center',
     },
     {
-      field: 'linkUri',
-      headerName: 'url',
+      field: 'nameUser',
+      headerName: 'Tên người dùng',
       width: 200,
+      align: 'center',
+      headerAlign: 'center',
     },
     {
-      field: 'userCreate',
-      headerName: 'Người tạo',
+      field: 'statusUser',
+      headerName: 'Trạng thái',
       width: 200,
-    },
-    {
-      field: 'userUpdate',
-      headerName: 'Người cập nhật',
-      width: 200,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => {
+        if (params.row.statusUser === 1) {
+          return (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                // gap: 3,
+                width: '100%',
+                padding: 2,
+              }}
+            >
+              <Typography variant="body2" color="success.main">
+                Đang hoạt động
+              </Typography>
+            </Box>
+          )
+        } else if (params.row.statusUser === 0) {
+          return (
+            <Typography variant="body2" color="error.main">
+              Ngừng hoạt động
+            </Typography>
+          )
+        } else if (params.row.statusUser === 2) {
+          return (
+            <Typography variant="body2" color="warning.main">
+              Khoá
+            </Typography>
+          )
+        }
+      },
     },
     {
       field: 'action',
       headerName: 'Chức năng',
       width: 150,
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params) => (
         <Box
           sx={{
@@ -139,22 +127,16 @@ const MenuPage = () => {
             //   // })
             // }
           />
-          <DeleteIcon
-            sx={{ color: 'error.main', cursor: 'pointer' }}
-            onClick={() => {}}
-          />
         </Box>
       ),
       sortable: false,
       filterable: false,
-      // align: 'center',
-      // headerAlign: 'center',
     },
   ]
 
-  const rows = menu.map((menu) => ({
-    ...menu,
-    id: menu.idMenu, // DataGrid requires an `id` field
+  const rows = user.map((user) => ({
+    ...user,
+    id: user.id, // DataGrid requires an `id` field
   }))
 
   return (
@@ -177,19 +159,7 @@ const MenuPage = () => {
             mb: 2,
           }}
         >
-          <Typography variant="h5">Danh sách tất cả Menu</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenDialog}
-          >
-            Thêm Menu
-          </Button>
-          <DialogThemMenu
-            open={open}
-            onClose={handleCloseDialog}
-            onSubmit={handleAddMenu}
-          />
+          <Typography variant="h5">Danh sách tất cả tài khoản</Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
 
@@ -213,4 +183,4 @@ const MenuPage = () => {
   )
 }
 
-export default MenuPage
+export default UserManagerPage

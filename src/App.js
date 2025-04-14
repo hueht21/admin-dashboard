@@ -9,6 +9,7 @@ import {
   MenuPage,
   RoleList,
   RoleDetail,
+  UserManagerPage,
 } from './page'
 
 import ProtectedRoute from './components/ProtectedRoute'
@@ -30,6 +31,7 @@ function App() {
             <Route path="menus" element={<MenuPage />} />
             <Route path="roles" element={<RoleList />} />
             <Route path="roles/:id" element={<RoleDetail />} />
+            <Route path="user-manager" element={<UserManagerPage />} />
           </Route>
 
           {/* Thêm route menu khác ở đây */}

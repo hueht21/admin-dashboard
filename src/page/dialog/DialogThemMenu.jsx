@@ -47,7 +47,7 @@ const DialogThemMenu = ({ open, onClose, onSubmit }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Thêm Menu Mới</DialogTitle>
+      <DialogTitle>Thêm Menu mới</DialogTitle>
       <DialogContent>
         <Stack spacing={2} mt={1}>
           <TextField
