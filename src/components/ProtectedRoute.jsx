@@ -6,9 +6,14 @@ const ProtectedRoute = ({ allowedPaths }) => {
   const location = useLocation()
   const path = location.pathname.replace('/dashboard', '')
 
+  console.log('✅ current path:', path)
   console.log('✅ allowedPaths:', allowedPaths)
 
-  if (allowedPaths.includes(path)) {
+  const isAllowed = allowedPaths.some((allowedPath) =>
+    path.startsWith(allowedPath)
+  )
+
+  if (isAllowed) {
     return <Outlet />
   }
 

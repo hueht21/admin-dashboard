@@ -8,6 +8,7 @@ import {
   OrdersPage,
   MenuPage,
   RoleList,
+  RoleDetail,
 } from './page'
 
 import ProtectedRoute from './components/ProtectedRoute'
@@ -28,6 +29,7 @@ function App() {
             <Route path="orders" element={<OrdersPage />} />
             <Route path="menus" element={<MenuPage />} />
             <Route path="roles" element={<RoleList />} />
+            <Route path="roles/:id" element={<RoleDetail />} />
           </Route>
 
           {/* Thêm route menu khác ở đây */}

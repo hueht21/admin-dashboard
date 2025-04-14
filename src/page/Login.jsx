@@ -13,6 +13,8 @@ import {
   CircularProgress,
 } from '@mui/material'
 
+import { GoogleLogin } from '@react-oauth/google'
+
 const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -49,7 +51,9 @@ const Login = () => {
         password,
       })
 
-      login(response.data.data.user)
+      login(response.data.data.user, response.data.data.token) // Lưu thông tin người dùng vào AuthContext
+
+      console.log('response', response.data.data.token)
 
       // Chuyển hướng tới dashboard hoặc trang chính của ứng dụng
       console.log('ddanwg nhap thanh cong')
@@ -108,6 +112,7 @@ const Login = () => {
               'Đăng nhập'
             )}
           </Button>
+          {/* <GoogleLogin onError={() => console.log('Login Failed')} /> */}
         </Stack>
       </Paper>
     </Box>

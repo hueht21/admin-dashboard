@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
-  List,
-  ListItem,
-  ListItemText,
   Typography,
   Divider,
   Paper,
   CircularProgress,
 } from '@mui/material'
-
-import { useAuth } from '../context/AuthContext'
+import { DataGrid } from '@mui/x-data-grid'
+import EditIcon from '@mui/icons-material/Edit'
 
 const RoleList = () => {
   const [roles, setRoles] = useState([])
   const [loading, setLoading] = useState(true)
-
-    const { userAuth } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchRoles = async () => {
+      const token = localStorage.getItem('token')
       try {
         const response = await axios.get(
           'http://localhost:8080/api/roles/get-all',
           {
             headers: {
-              Authorization: `Bearer ${userAuth.}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         )
@@ -43,9 +41,60 @@ const RoleList = () => {
     fetchRoles()
   }, [])
 
+  const columns = [
+    {
+      field: 'idRole',
+      headerName: 'ID',
+      width: 100,
+    },
+    {
+      field: 'describe',
+      headerName: 'Mô tả quyền',
+      width: 250,
+    },
+    {
+      field: 'nameRole',
+      headerName: 'Tên quyền',
+      width: 200,
+    },
+    {
+      field: 'action',
+      headerName: 'Chức năng',
+      width: 150,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            padding: 1,
+          }}
+        >
+          <EditIcon
+            sx={{ color: 'primary.main', cursor: 'pointer' }}
+            onClick={() =>
+              navigate(`/dashboard/roles/${params.row.idRole}`, {
+                state: { role: params.row },
+              })
+            }
+          />
+        </Box>
+      ),
+      sortable: false,
+      filterable: false,
+      // align: 'center',
+      // headerAlign: 'center',
+    },
+  ]
+
+  const rows = roles.map((role) => ({
+    ...role,
+    id: role.idRole, // DataGrid requires an `id` field
+  }))
+
   return (
-    <Box sx={{ p: 4 }}>
-      <Paper sx={{ p: 3 }}>
+    <Box sx={{ p: 1 }}>
+      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
         <Typography variant="h5" gutterBottom>
           Danh sách tất cả Role
         </Typography>
@@ -56,16 +105,15 @@ const RoleList = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <List>
-            {roles.map((role) => (
-              <ListItem key={role.idRole}>
-                <ListItemText
-                  primary={role.nameRole}
-                  secondary={role.describe}
-                />
-              </ListItem>
-            ))}
-          </List>
+          <Box sx={{ height: 500, width: '100%' }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={8}
+              rowsPerPageOptions={[8, 16]}
+              disableSelectionOnClick
+            />
+          </Box>
         )}
       </Paper>
     </Box>

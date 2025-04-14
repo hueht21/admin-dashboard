@@ -8,9 +8,9 @@ export const AuthProvider = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null
   })
 
-  const login = (userData) => {
+  const login = (userData, token) => {
     localStorage.setItem('user', JSON.stringify(userData))
-    localStorage.setItem('token', userData.token) // Assuming userData contains a token
+    localStorage.setItem('token', token) // Assuming userData contains a token
     setUser(userData)
   }
 
