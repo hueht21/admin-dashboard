@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 
 // import { GoogleLogin } from '@react-oauth/google'
+import { GoogleLogin } from '@react-oauth/google'
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -22,29 +23,60 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const [errors, setErrors] = useState({ username: '', password: '' })
 
   // Hàm validate các trường nhập
   const validate = () => {
+    const newErrors = { username: '', password: '' }
     let valid = true
-    const errors = { username: '', password: '' }
 
     if (!username.trim()) {
-      errors.username = 'Vui lòng nhập tên đăng nhập'
+      newErrors.username = 'Vui lòng nhập tên đăng nhập'
       valid = false
     }
+
     if (!password.trim()) {
-      errors.password = 'Vui lòng nhập mật khẩu'
+      newErrors.password = 'Vui lòng nhập mật khẩu'
       valid = false
     }
+
+    setErrors(newErrors) // Cập nhật state lỗi
     return valid
   }
 
   const { login } = useAuth()
 
+  // Hàm xử lý đăng nhập qua Google
+  const handleGoogleLoginSuccess = async (response) => {
+    const { credential } = response
+
+    console.log(credential)
+    try {
+      const googleResponse = await axios.post(
+        'http://localhost:8080/api/auth/google',
+        {
+          token: credential, // Gửi token Google đến backend
+        }
+      )
+
+      login(googleResponse.data.data.user, googleResponse.data.data.token) // Lưu thông tin người dùng vào AuthContext
+      navigate('/dashboard') // Chuyển hướng tới trang dashboard
+    } catch (err) {
+      setErrorMessage('Đăng nhập Google thất bại')
+    }
+  }
+
+  const handleGoogleLoginFailure = (error) => {
+    setErrorMessage('Đăng nhập Google thất bại')
+    console.log('Google login failed:', error)
+  }
+
   const handleSubmit = async (e) => {
     // Validate input, nếu không hợp lệ thì không gọi API
     if (!validate()) return
-    setLoading(true) // Bật loading trước khi gọi API
+    setLoading(true)
     try {
       const response = await axios.post('http://localhost:8080/api/login', {
         username,
@@ -60,10 +92,9 @@ const Login = () => {
       navigate('/dashboard')
     } catch (err) {
       console.error('Login error:', err)
-      // Nếu có lỗi, hiển thị thông báo lỗi
-      // setError('Sai tài khoản hoặc mật khẩu!');
+      setErrorMessage(err.response.data || 'Đăng nhập thất bại')
     } finally {
-      setLoading(false) // Tắt loading sau khi API gọi xong
+      setLoading(false)
     }
   }
 
@@ -86,9 +117,14 @@ const Login = () => {
             variant="outlined"
             fullWidth
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            error={!username.trim()}
-            helperText={!username.trim() ? 'Vui lòng nhập tên đăng nhập' : ''}
+            onChange={(e) => {
+              setUsername(e.target.value)
+              if (errors.username) {
+                setErrors((prev) => ({ ...prev, username: '' }))
+              }
+            }}
+            error={!!errors.username}
+            helperText={errors.username}
           />
           <TextField
             label="Mật khẩu"
@@ -96,9 +132,14 @@ const Login = () => {
             type="password"
             fullWidth
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!password.trim()}
-            helperText={!password.trim() ? 'Vui lòng nhập mật khẩu' : ''}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              if (errors.password) {
+                setErrors((prev) => ({ ...prev, password: '' }))
+              }
+            }}
+            error={!!errors.password}
+            helperText={errors.password}
           />
           <Button
             variant="contained"
@@ -112,7 +153,16 @@ const Login = () => {
               'Đăng nhập'
             )}
           </Button>
-          {/* <GoogleLogin onError={() => console.log('Login Failed')} /> */}
+          {errorMessage && (
+            <Typography color="error" fontSize={14} textAlign="center">
+              {errorMessage}
+            </Typography>
+          )}
+          <GoogleLogin
+            onSuccess={handleGoogleLoginSuccess}
+            onError={handleGoogleLoginFailure}
+            useOneTap // Kích hoạt tính năng đăng nhập một lần (One Tap)
+          />
         </Stack>
       </Paper>
     </Box>

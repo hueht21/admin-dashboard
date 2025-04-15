@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import axios from 'axios'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack' // Import mũi tên
+import { useAuth } from '../context/AuthContext'
 
 const RoleDetail = () => {
   const location = useLocation()
@@ -24,6 +25,12 @@ const RoleDetail = () => {
   const [menus, setMenus] = useState([])
   const [checkedMenus, setCheckedMenus] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const { logout } = useAuth()
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   useEffect(() => {
     const fetchMenus = async () => {
@@ -79,7 +86,8 @@ const RoleDetail = () => {
       )
 
       alert('Cập nhật quyền thành công!')
-      navigate('/dashboard/roles') // Điều hướng lại về trang danh sách role
+      // navigate('/dashboard/roles') // Điều hướng lại về trang danh sách role
+      handleLogout()
     } catch (error) {
       console.error('Lỗi khi lưu quyền:', error)
       alert('Lỗi khi lưu quyền!')

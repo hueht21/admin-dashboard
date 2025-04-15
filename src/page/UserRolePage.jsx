@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import axios from 'axios'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 const UserRolePage = () => {
   const location = useLocation()
@@ -25,23 +26,30 @@ const UserRolePage = () => {
   const [checkedRoles, setCheckedRoles] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const [openDialog, setOpenDialog] = useState(false)
+
   useEffect(() => {
+    console.log('userId:', userId)
+
     const fetchRoles = async () => {
       try {
         const [allRolesRes, userRolesRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/roles/all', {
+          axios.get('http://localhost:8080/api/roles/get-all', {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
           }),
-          axios.get(`http://localhost:8080/api/users/roles?userId=${userId}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }),
+          axios.get(
+            `http://localhost:8080/api/roles/get-role-by-user-id?userId=${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            }
+          ),
         ])
         setRoles(allRolesRes.data.data)
-        setCheckedRoles(userRolesRes.data.data.map((role) => role.id))
+        setCheckedRoles(userRolesRes.data.data.map((role) => role.idRole))
       } catch (error) {
         console.error('Lỗi khi tải role:', error)
       } finally {
@@ -65,10 +73,10 @@ const UserRolePage = () => {
   const handleSave = async () => {
     try {
       await axios.put(
-        'http://localhost:8080/api/users/update-user-roles',
+        'http://localhost:8080/api/roles/updateUserRole',
         {
           userId,
-          roleIds: checkedRoles,
+          listRole: checkedRoles,
         },
         {
           headers: {
@@ -77,7 +85,7 @@ const UserRolePage = () => {
         }
       )
       alert('Cập nhật quyền người dùng thành công!')
-      navigate('/dashboard/accounts')
+      navigate('/dashboard/user-manager')
     } catch (error) {
       console.error('Lỗi khi lưu quyền:', error)
       alert('Lỗi khi lưu quyền người dùng!')
@@ -108,7 +116,7 @@ const UserRolePage = () => {
             <b>Tên đăng nhập:</b> {user.userName}
           </Typography>
           <Typography variant="subtitle2" sx={{ mt: 1 }}>
-            <b>ID:</b> {user.id}
+            <b>Tên người dùng :</b> {user.nameUser}
           </Typography>
         </Paper>
 
@@ -121,11 +129,11 @@ const UserRolePage = () => {
           <FormGroup>
             {roles.map((role) => (
               <FormControlLabel
-                key={role.id}
+                key={role.idRole}
                 control={
                   <Checkbox
-                    checked={checkedRoles.includes(role.id)}
-                    onChange={() => handleToggle(role.id)}
+                    checked={checkedRoles.includes(role.idRole)}
+                    onChange={() => handleToggle(role.idRole)}
                   />
                 }
                 label={role.nameRole}
@@ -136,10 +144,17 @@ const UserRolePage = () => {
             variant="contained"
             color="primary"
             sx={{ mt: 2 }}
-            onClick={handleSave}
+            onClick={() => setOpenDialog(true)}
           >
             Lưu thay đổi
           </Button>
+          <ConfirmDialog
+            open={openDialog}
+            onClose={() => setOpenDialog(false)}
+            onConfirm={handleSave}
+            title="Xác nhận thay đổi quyền"
+            content="Bạn có chắc chắn muốn thay đổi quyền này không?"
+          />
         </Paper>
       </Box>
     </>

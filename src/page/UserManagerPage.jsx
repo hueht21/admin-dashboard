@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import axios from 'axios'
 // import { useNavigate } from 'react-router-dom'
 import {
@@ -10,9 +12,10 @@ import {
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import LockIcon from '@mui/icons-material/Lock'
 
 const UserManagerPage = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -121,11 +124,18 @@ const UserManagerPage = () => {
         >
           <EditIcon
             sx={{ color: 'primary.main', cursor: 'pointer' }}
-            // onClick={() =>
-            //   // navigate(`/dashboard/roles/${params.row.idRole}`, {
-            //   //   state: { role: params.row },
-            //   // })
-            // }
+            onClick={() =>
+              navigate(`/dashboard/user-manager/${params.row.id}`, {
+                state: { user: params.row },
+              })
+            }
+          />
+          <LockIcon
+            sx={{ color: 'secondary.main', cursor: 'pointer' }}
+            onClick={() => {
+              // Xử lý khi click vào icon khoá (tuỳ bạn thêm logic)
+              console.log('Khoá tài khoản:', params.row.id)
+            }}
           />
         </Box>
       ),

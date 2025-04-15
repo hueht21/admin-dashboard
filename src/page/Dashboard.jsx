@@ -62,7 +62,24 @@ const DashboardLayout = () => {
           <ListItem key={index} disablePadding>
             <ListItemButton
               onClick={() => handleMenuClick(menu.menuUrl)}
-              selected={location.pathname === `/dashboard${menu.menuUrl}`}
+              selected={location.pathname.startsWith(
+                `/dashboard${menu.menuUrl}`
+              )}
+              sx={{
+                '&.Mui-selected': {
+                  backgroundColor: '#1976d2',
+                  color: '#fff',
+                  '& .MuiListItemText-root': {
+                    color: '#fff',
+                  },
+                },
+                '&.Mui-selected:hover': {
+                  backgroundColor: '#1976d2',
+                },
+                '&:hover': {
+                  backgroundColor: '#e3f2fd',
+                },
+              }}
             >
               <ListItemText primary={menu.menuName} />
             </ListItemButton>
@@ -91,7 +108,7 @@ const DashboardLayout = () => {
             </IconButton>
           )}
           <Typography variant="h6" noWrap>
-            Xin chào, {user?.userName}
+            Xin chào, {user?.nameUser}
           </Typography>
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />

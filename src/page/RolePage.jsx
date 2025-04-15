@@ -94,7 +94,15 @@ const RoleList = () => {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+      <Paper
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          boxShadow: 3,
+          width: '100%',
+          maxWidth: 800,
+        }}
+      >
         <Typography variant="h5" gutterBottom>
           Danh sách tất cả Role
         </Typography>
