@@ -21,6 +21,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DialogThemMenu from '../page/dialog/DialogThemMenu'
+import CustomSnackbar from '../components/CustomSnackbar'
 
 const MenuPage = () => {
   const [menu, setMenu] = useState([])
@@ -32,9 +33,18 @@ const MenuPage = () => {
   const handleOpenDialog = () => setOpen(true)
   const handleCloseDialog = () => setOpen(false)
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbarMessage(message)
+    setSnackbarSeverity(severity)
+    setSnackbarOpen(true)
+  }
+
   const handleAddMenu = async (menu) => {
-    // console.log('Thêm menu:', menuData)
-    setLoading(true) // Bật loading trước khi gọi API
+    setLoading(true)
     try {
       const user = JSON.parse(localStorage.getItem('user'))
       const userId = user?.id
@@ -55,9 +65,13 @@ const MenuPage = () => {
 
       if (response.data.status) {
         fetchMenus()
+        showSnackbar('Thêm mới menu thành công', 'success')
+      } else {
+        showSnackbar(response.data.message, 'error')
       }
     } catch (error) {
       console.error('Lỗi khi lấy danh sách menu:', error)
+      showSnackbar('Lỗi khi thêm menu', error)
     } finally {
       setLoading(false)
     }
@@ -116,40 +130,40 @@ const MenuPage = () => {
       headerName: 'Người cập nhật',
       width: 200,
     },
-    {
-      field: 'action',
-      headerName: 'Chức năng',
-      width: 150,
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 2,
-            width: '100%',
-            padding: 1,
-          }}
-        >
-          <EditIcon
-            sx={{ color: 'primary.main', cursor: 'pointer' }}
-            // onClick={() =>
-            //   // navigate(`/dashboard/roles/${params.row.idRole}`, {
-            //   //   state: { role: params.row },
-            //   // })
-            // }
-          />
-          <DeleteIcon
-            sx={{ color: 'error.main', cursor: 'pointer' }}
-            onClick={() => {}}
-          />
-        </Box>
-      ),
-      sortable: false,
-      filterable: false,
-      // align: 'center',
-      // headerAlign: 'center',
-    },
+    // {
+    //   field: 'action',
+    //   headerName: 'Chức năng',
+    //   width: 150,
+    //   renderCell: (params) => (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         justifyContent: 'center',
+    //         alignItems: 'center',
+    //         gap: 2,
+    //         width: '100%',
+    //         padding: 1,
+    //       }}
+    //     >
+    //       <EditIcon
+    //         sx={{ color: 'primary.main', cursor: 'pointer' }}
+    //         // onClick={() =>
+    //         //   // navigate(`/dashboard/roles/${params.row.idRole}`, {
+    //         //   //   state: { role: params.row },
+    //         //   // })
+    //         // }
+    //       />
+    //       <DeleteIcon
+    //         sx={{ color: 'error.main', cursor: 'pointer' }}
+    //         onClick={() => {}}
+    //       />
+    //     </Box>
+    //   ),
+    //   sortable: false,
+    //   filterable: false,
+    //   // align: 'center',
+    //   // headerAlign: 'center',
+    // },
   ]
 
   const rows = menu.map((menu) => ({
@@ -209,6 +223,12 @@ const MenuPage = () => {
           </Box>
         )}
       </Paper>
+      <CustomSnackbar
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+      />
     </Box>
   )
 }

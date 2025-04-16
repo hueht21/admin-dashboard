@@ -87,10 +87,19 @@ const RoleDetail = () => {
 
       alert('Cập nhật quyền thành công!')
       // navigate('/dashboard/roles') // Điều hướng lại về trang danh sách role
-      handleLogout()
+      // handleLogout()
     } catch (error) {
       console.error('Lỗi khi lưu quyền:', error)
-      alert('Lỗi khi lưu quyền!')
+      // alert('Lỗi khi lưu quyền!')
+
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        navigate('/login')
+      } else {
+        alert('Lỗi khi lưu quyền!')
+      }
     }
     checkedMenus.forEach((menuId) => {
       console.log(`Menu ID: ${menuId}`)

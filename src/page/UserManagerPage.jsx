@@ -13,11 +13,30 @@ import {
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
 import LockIcon from '@mui/icons-material/Lock'
+import LockOpenIcon from '@mui/icons-material/LockOpen'
+import ConfirmDialog from '../components/ConfirmDialog'
+import UserStatusCell from '../components/UserStatusCell'
+import CustomSnackbar from '../components/CustomSnackbar'
 
 const UserManagerPage = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState([])
   const [loading, setLoading] = useState(true)
+  const [openDialog, setOpenDialog] = useState(false)
+  const [titleDiaglog, setTitleDialog] = useState('')
+  const [contentDiaglog, setContentDialog] = useState('')
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+
+  const [dialogAction, setDialogAction] = useState(() => () => {})
+
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbarMessage(message)
+    setSnackbarSeverity(severity)
+    setSnackbarOpen(true)
+  }
 
   useEffect(() => {
     fetchUser()
@@ -39,8 +58,59 @@ const UserManagerPage = () => {
       }
     } catch (error) {
       console.error('Lỗi khi lấy danh sách menu:', error)
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        navigate('/login')
+      }
     } finally {
       setLoading(false)
+    }
+  }
+
+  const confirmLookAcc = async (idUser, status) => {
+    const token = localStorage.getItem('token')
+    console.log(token)
+    console.log(idUser)
+    console.log(
+      'Gửi request tới:',
+      `http://localhost:8080/api/roles/lock-account`
+    )
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/api/roles/lock-account`,
+        { userId: idUser, status: status },
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      console.log(response.data)
+      if (response.data?.status) {
+        showSnackbar(
+          status === 1
+            ? 'Mở khoá tài khoản thành công'
+            : 'Khóa tài khoản thành công',
+          'success'
+        )
+
+        await fetchUser()
+        setOpenDialog(false)
+      } else {
+        showSnackbar('Không thể khóa tài khoản', 'error')
+      }
+    } catch (error) {
+      showSnackbar('Đã xảy ra lỗi khi khóa tài khoản', 'error')
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        navigate('/login')
+      }
     }
   }
 
@@ -72,38 +142,7 @@ const UserManagerPage = () => {
       width: 200,
       align: 'center',
       headerAlign: 'center',
-      renderCell: (params) => {
-        if (params.row.statusUser === 1) {
-          return (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                // gap: 3,
-                width: '100%',
-                padding: 2,
-              }}
-            >
-              <Typography variant="body2" color="success.main">
-                Đang hoạt động
-              </Typography>
-            </Box>
-          )
-        } else if (params.row.statusUser === 0) {
-          return (
-            <Typography variant="body2" color="error.main">
-              Ngừng hoạt động
-            </Typography>
-          )
-        } else if (params.row.statusUser === 2) {
-          return (
-            <Typography variant="body2" color="warning.main">
-              Khoá
-            </Typography>
-          )
-        }
-      },
+      renderCell: (params) => <UserStatusCell status={params.row.statusUser} />,
     },
     {
       field: 'action',
@@ -131,12 +170,30 @@ const UserManagerPage = () => {
             }
           />
           <LockIcon
-            sx={{ color: 'secondary.main', cursor: 'pointer' }}
+            sx={{ color: '#FF5500', cursor: 'pointer' }}
             onClick={() => {
-              // Xử lý khi click vào icon khoá (tuỳ bạn thêm logic)
-              console.log('Khoá tài khoản:', params.row.id)
+              setTitleDialog('Xác nhận khoá người dùng')
+              setContentDialog('Bạn có chắc chắn muốn khoá người dùng này?')
+              setOpenDialog(true)
+              // setIdUser(params.row.id)
+              setDialogAction(
+                () => async () => await confirmLookAcc(params.row.id, 2)
+              )
             }}
           />
+          <LockOpenIcon
+            sx={{ color: '#FF5500', cursor: 'pointer' }}
+            onClick={() => {
+              setTitleDialog('Xác nhận mở khoá người dùng')
+              setContentDialog('Bạn có chắc chắn muốn mở khoá người dùng này?')
+
+              setOpenDialog(true)
+              // setIdUser(params.row.id)
+              setDialogAction(
+                () => async () => await confirmLookAcc(params.row.id, 1)
+              )
+            }}
+          ></LockOpenIcon>
         </Box>
       ),
       sortable: false,
@@ -189,6 +246,21 @@ const UserManagerPage = () => {
           </Box>
         )}
       </Paper>
+      <ConfirmDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={() => {
+          dialogAction()
+        }}
+        title={titleDiaglog}
+        content={contentDiaglog}
+      />
+      <CustomSnackbar
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+      />
     </Box>
   )
 }

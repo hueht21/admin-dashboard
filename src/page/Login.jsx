@@ -61,8 +61,12 @@ const Login = () => {
         }
       )
 
-      login(googleResponse.data.data.user, googleResponse.data.data.token) // Lưu thông tin người dùng vào AuthContext
-      navigate('/dashboard') // Chuyển hướng tới trang dashboard
+      if (googleResponse.data.status) {
+        login(googleResponse.data.data.user, googleResponse.data.data.token) // Lưu thông tin người dùng vào AuthContext
+        navigate('/dashboard') // Chuyển hướng tới trang dashboard
+      } else {
+        setErrorMessage(response.data.message || 'Đăng nhập thất bại')
+      }
     } catch (err) {
       setErrorMessage('Đăng nhập Google thất bại')
     }
@@ -83,13 +87,16 @@ const Login = () => {
         password,
       })
 
-      login(response.data.data.user, response.data.data.token) // Lưu thông tin người dùng vào AuthContext
+      if (response.data.status) {
+        login(response.data.data.user, response.data.data.token) // Lưu thông tin người dùng vào AuthContext
 
-      console.log('response', response.data.data.token)
+        console.log('response', response.data.data.token)
 
-      // Chuyển hướng tới dashboard hoặc trang chính của ứng dụng
-      console.log('ddanwg nhap thanh cong')
-      navigate('/dashboard')
+        // Chuyển hướng tới dashboard hoặc trang chính của ứng dụng
+        navigate('/dashboard')
+      } else {
+        setErrorMessage(response.data.message || 'Đăng nhập thất bại')
+      }
     } catch (err) {
       console.error('Login error:', err)
       setErrorMessage(err.response.data || 'Đăng nhập thất bại')

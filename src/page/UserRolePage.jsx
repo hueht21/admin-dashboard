@@ -52,6 +52,12 @@ const UserRolePage = () => {
         setCheckedRoles(userRolesRes.data.data.map((role) => role.idRole))
       } catch (error) {
         console.error('Lỗi khi tải role:', error)
+        if (
+          error.response &&
+          (error.response.status === 401 || error.response.status === 403)
+        ) {
+          navigate('/login')
+        }
       } finally {
         setLoading(false)
       }
@@ -88,7 +94,13 @@ const UserRolePage = () => {
       navigate('/dashboard/user-manager')
     } catch (error) {
       console.error('Lỗi khi lưu quyền:', error)
-      alert('Lỗi khi lưu quyền người dùng!')
+      // alert('Lỗi khi lưu quyền người dùng!')
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        navigate('/login')
+      }
     }
   }
 
