@@ -61,13 +61,15 @@ const Login = () => {
         }
       )
 
+      console.log('log', googleResponse)
       if (googleResponse.data.status) {
         login(googleResponse.data.data.user, googleResponse.data.data.token) // Lưu thông tin người dùng vào AuthContext
         navigate('/dashboard') // Chuyển hướng tới trang dashboard
       } else {
-        setErrorMessage(response.data.message || 'Đăng nhập thất bại')
+        setErrorMessage(googleResponse.data.message || 'Đăng nhập thất bại')
       }
     } catch (err) {
+      console.log('log', err)
       setErrorMessage('Đăng nhập Google thất bại')
     }
   }

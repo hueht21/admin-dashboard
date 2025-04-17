@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   Box,
@@ -10,17 +10,22 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Collapse,
+  Divider,
+  IconButton,
 } from '@mui/material'
 
 import LogoutIcon from '@mui/icons-material/Logout'
-import IconButton from '@mui/material/IconButton'
-
 import MenuIcon from '@mui/icons-material/Menu'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
-import Divider from '@mui/material/Divider'
-
 import { useAuth } from '../context/AuthContext'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices'
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 
 const drawerWidth = 240
 
@@ -28,70 +33,137 @@ const DashboardLayout = () => {
   const storedUser = localStorage.getItem('user')
   const user = storedUser ? JSON.parse(storedUser) : null
   const location = useLocation()
-  const listMenu = user?.listMenu ?? []
   const navigate = useNavigate()
+  const listMenu = user?.listMenu ?? []
 
-  const handleMenuClick = (menuUrl) => {
-    console.log(`/dashboard${menuUrl}`)
-    navigate(`/dashboard${menuUrl}`)
+  const { logout } = useAuth()
+  console.log('Dashboard render', location.pathname)
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
   }
 
-  // Redirect về login nếu chưa login
   useEffect(() => {
     if (!user) {
       navigate('/login')
     }
   }, [user, navigate])
 
-  const { logout } = useAuth()
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [openMenus, setOpenMenus] = useState({}) // để mở/tắt menu cha
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
+
+  const handleMenuClick = (menuUrl) => {
+    navigate(`/dashboard${menuUrl}`)
+  }
+
+  const handleToggleGroup = (groupName) => {
+    setOpenMenus((prev) => ({ ...prev, [groupName]: !prev[groupName] }))
+  }
+
+  const groupMenus = (menus) => {
+    return [
+      {
+        groupName: 'Quản lý hệ thống',
+        icon: <AdminPanelSettingsIcon />,
+        children: menus.filter((menu) =>
+          ['/roles', '/menus', '/accounts', '/user-manager'].includes(
+            menu.menuUrl
+          )
+        ),
+      },
+      {
+        groupName: 'Quản lý dịch vụ',
+        icon: <MiscellaneousServicesIcon />,
+        children: menus.filter((menu) =>
+          ['/categories', '/orders', '/customers', '/oder-cus'].includes(
+            menu.menuUrl
+          )
+        ),
+      },
+      {
+        groupName: 'Khác',
+        icon: <DashboardCustomizeIcon />,
+        children: menus.filter(
+          (menu) =>
+            ![
+              '/roles',
+              '/menus',
+              '/accounts',
+              '/user-manager',
+              '/categories',
+              '/orders',
+              '/customers',
+              '/oder-cus',
+            ].includes(menu.menuUrl)
+        ),
+      },
+    ]
+  }
+
+  const groupedMenu = groupMenus(listMenu)
 
   const drawerContent = (
     <>
       <Toolbar />
       <Divider />
       <List>
-        {listMenu?.map((menu, index) => (
-          <ListItem key={index} disablePadding>
-            <ListItemButton
-              onClick={() => handleMenuClick(menu.menuUrl)}
-              selected={location.pathname.startsWith(
-                `/dashboard${menu.menuUrl}`
-              )}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: '#1976d2',
-                  color: '#fff',
-                  '& .MuiListItemText-root': {
-                    color: '#fff',
-                  },
-                },
-                '&.Mui-selected:hover': {
-                  backgroundColor: '#1976d2',
-                },
-                '&:hover': {
-                  backgroundColor: '#e3f2fd',
-                },
-              }}
-            >
-              <ListItemText primary={menu.menuName} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {groupedMenu.map((group, idx) =>
+          group.children.length > 0 ? (
+            <Box key={idx}>
+              <ListItemButton
+                onClick={() => handleToggleGroup(group.groupName)}
+              >
+                {group.icon && <Box sx={{ mr: 1 }}>{group.icon}</Box>}
+                <ListItemText
+                  primary={group.groupName}
+                  sx={{ fontWeight: 'bold' }}
+                />
+                {openMenus[group.groupName] ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse
+                in={openMenus[group.groupName]}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="div" disablePadding>
+                  {group.children.map((menu) => (
+                    <ListItem key={menu.id} disablePadding sx={{ pl: 4 }}>
+                      <ListItemButton
+                        onClick={() => handleMenuClick(menu.menuUrl)}
+                        selected={location.pathname.startsWith(
+                          `/dashboard${menu.menuUrl}`
+                        )}
+                        sx={{
+                          '&.Mui-selected': {
+                            backgroundColor: '#1976d2',
+                            color: '#fff',
+                          },
+                          '&.Mui-selected:hover': {
+                            backgroundColor: '#1976d2',
+                          },
+                          '&:hover': {
+                            backgroundColor: '#e3f2fd',
+                          },
+                        }}
+                      >
+                        <ListItemText primary={menu.menuName} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Collapse>
+            </Box>
+          ) : null
+        )}
       </List>
     </>
   )
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const [mobileOpen, setMobileOpen] = React.useState(false)
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -116,16 +188,13 @@ const DashboardLayout = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer */}
       <Box component="nav">
         {isMobile ? (
           <Drawer
             variant="temporary"
             open={mobileOpen}
             onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true,
-            }}
+            ModalProps={{ keepMounted: true }}
             sx={{
               '& .MuiDrawer-paper': { width: drawerWidth },
             }}

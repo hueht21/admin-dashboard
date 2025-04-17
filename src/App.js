@@ -16,6 +16,7 @@ import {
   RoleDetail,
   UserManagerPage,
   UserRolePage,
+  HomePage,
 } from './page'
 
 import ProtectedRoute from './components/ProtectedRoute'
@@ -28,8 +29,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route element={<ProtectedRoute allowedPaths={allowedPaths} />}>
             <Route path="accounts" element={<Accounts />} />

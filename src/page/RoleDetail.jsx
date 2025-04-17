@@ -27,10 +27,10 @@ const RoleDetail = () => {
   const [loading, setLoading] = useState(true)
 
   const { logout } = useAuth()
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+  // const handleLogout = () => {
+  //   logout()
+  //   navigate('/login')
+  // }
 
   useEffect(() => {
     const fetchMenus = async () => {

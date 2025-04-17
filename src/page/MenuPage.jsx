@@ -18,8 +18,8 @@ import {
   Button,
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+// import EditIcon from '@mui/icons-material/Edit'
+// import DeleteIcon from '@mui/icons-material/Delete'
 import DialogThemMenu from '../page/dialog/DialogThemMenu'
 import CustomSnackbar from '../components/CustomSnackbar'
 
@@ -80,6 +80,7 @@ const MenuPage = () => {
   }
 
   useEffect(() => {
+    console.log('call nhieu lan')
     fetchMenus()
   }, [])
 

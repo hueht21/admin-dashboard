@@ -33,12 +33,12 @@ const RoleList = () => {
         }
       } catch (error) {
         console.error('Lỗi khi lấy danh sách role:', error)
-        if (
-          error.response &&
-          (error.response.status === 401 || error.response.status === 403)
-        ) {
-          navigate('/login')
-        }
+        // if (
+        //   error.response &&
+        //   (error.response.status === 401 || error.response.status === 403)
+        // ) {
+        //   navigate('/login')
+        // }
       } finally {
         setLoading(false)
       }
