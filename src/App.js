@@ -4,7 +4,6 @@ import {
   Route,
   Navigate,
 } from 'react-router-dom'
-import Login from './page/Login'
 
 import {
   Accounts,
@@ -19,21 +18,15 @@ import {
   HomePage,
 } from './page'
 
-import ProtectedRoute from './components/ProtectedRoute'
-import { useAuth } from './context/AuthContext'
-
 function App() {
-  const { user } = useAuth()
-  const allowedPaths = user?.listMenu.map((menu) => menu.menuUrl) ?? []
-
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/login" element={<Login />} />
+
         <Route path="/home" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route element={<ProtectedRoute allowedPaths={allowedPaths} />}>
+          <Route>
             <Route path="accounts" element={<Accounts />} />
             <Route path="customers" element={<Customers />} />
             <Route path="orders" element={<OrdersPage />} />

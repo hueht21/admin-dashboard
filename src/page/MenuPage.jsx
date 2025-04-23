@@ -22,6 +22,7 @@ import { DataGrid } from '@mui/x-data-grid'
 // import DeleteIcon from '@mui/icons-material/Delete'
 import DialogThemMenu from '../page/dialog/DialogThemMenu'
 import CustomSnackbar from '../components/CustomSnackbar'
+import AppConfig from '../config/AppConfig'
 
 const MenuPage = () => {
   const [menu, setMenu] = useState([])
@@ -85,10 +86,10 @@ const MenuPage = () => {
   }, [])
 
   const fetchMenus = async () => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('access_token')
     try {
       const response = await axios.get(
-        'http://localhost:8080/api/menus/get-all-menus',
+        `${AppConfig.apiUrlBussiness}/api/menus/get-all-menus`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -99,7 +100,11 @@ const MenuPage = () => {
         setMenu(response.data.data)
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách menu:', error)
+      // console.error('Lỗi khi lấy danh sách menu:', error)
+      // localStorage.removeItem('access_token')
+      // localStorage.removeItem('userName')
+      // const redirectUri = encodeURIComponent(window.location.href)
+      // window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${redirectUri}`
     } finally {
       setLoading(false)
     }

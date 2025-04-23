@@ -10,13 +10,18 @@ import {
 } from '@mui/material'
 import { Card, CardContent } from '@mui/material'
 // import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
+
+import AppConfig from '../config/AppConfig'
 
 const HomePage = () => {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
 
   const handleLoginPage = () => {
-    navigate('/login')
+    // navigate('/login')
+
+    // Redirect về auth
+    window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
   }
 
   return (

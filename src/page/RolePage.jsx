@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
+import AppConfig from '../config/AppConfig'
 
 const RoleList = () => {
   const [roles, setRoles] = useState([])
@@ -21,7 +22,7 @@ const RoleList = () => {
       const token = localStorage.getItem('token')
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/roles/get-all',
+          `${AppConfig.apiUrlBussiness}/api/roles/get-all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
