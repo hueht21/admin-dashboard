@@ -15,6 +15,7 @@ import {
 import axios from 'axios'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack' // Import mũi tên
 import { useAuth } from '../context/AuthContext'
+import AppConfig from '../config/AppConfig'
 
 const RoleDetail = () => {
   const location = useLocation()
@@ -36,14 +37,14 @@ const RoleDetail = () => {
     const fetchMenus = async () => {
       try {
         const [allMenusRes, roleMenusRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/roles/all-menus', {
+          axios.get(`${AppConfig.apiUrlBussiness}/api/roles/all-menus`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
             },
           }),
-          axios.get(`http://localhost:8080/api/roles/menus?roleId=${idRole}`, {
+          axios.get(`${AppConfig.apiUrlBussiness}/api/roles/menus?roleId=${idRole}`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
             },
           }),
         ])
@@ -73,14 +74,14 @@ const RoleDetail = () => {
   const handleSave = async () => {
     try {
       await axios.put(
-        'http://localhost:8080/api/roles/update-role-menus', // URL
+        `${AppConfig.apiUrlBussiness}/api/roles/update-role-menus`, // URL
         {
           roleId: idRole,
           menuIds: checkedMenus,
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
           },
         }
       )

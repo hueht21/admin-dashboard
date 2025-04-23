@@ -19,7 +19,7 @@ const RoleList = () => {
 
   useEffect(() => {
     const fetchRoles = async () => {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('access_token')
       try {
         const response = await axios.get(
           `${AppConfig.apiUrlBussiness}/api/roles/get-all`,

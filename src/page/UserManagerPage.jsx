@@ -17,6 +17,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen'
 import ConfirmDialog from '../components/ConfirmDialog'
 import UserStatusCell from '../components/UserStatusCell'
 import CustomSnackbar from '../components/CustomSnackbar'
+import AppConfig from '../config/AppConfig'
 
 const UserManagerPage = () => {
   const navigate = useNavigate()
@@ -43,10 +44,10 @@ const UserManagerPage = () => {
   }, [])
 
   const fetchUser = async () => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('access_token')
     try {
       const response = await axios.get(
-        'http://localhost:8080/api/v1/user/getAllUser',
+        `${AppConfig.apiUrlBussiness}/api/v1/user/getAllUser`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -70,17 +71,17 @@ const UserManagerPage = () => {
   }
 
   const confirmLookAcc = async (idUser, status) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('access_token')
     console.log(token)
     console.log(idUser)
     console.log(
       'Gửi request tới:',
-      `http://localhost:8080/api/roles/lock-account`
+      `${AppConfig.apiUrlBussiness}/api/roles/lock-account`
     )
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/roles/lock-account`,
+        `${AppConfig.apiUrlBussiness}/api/roles/lock-account`,
         { userId: idUser, status: status },
 
         {

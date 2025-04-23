@@ -51,7 +51,7 @@ const MenuPage = () => {
       const userId = user?.id
 
       const response = await axios.post(
-        'http://localhost:8080/api/menus/save-menu',
+        `${AppConfig.apiUrlBussiness}/api/menus/save-menu`,
         {
           nameMenu: menu.menuName,
           linkUri: menu.menuUrl,
@@ -59,7 +59,7 @@ const MenuPage = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
           },
         }
       )
@@ -100,11 +100,10 @@ const MenuPage = () => {
         setMenu(response.data.data)
       }
     } catch (error) {
-      // console.error('Lỗi khi lấy danh sách menu:', error)
-      // localStorage.removeItem('access_token')
-      // localStorage.removeItem('userName')
-      // const redirectUri = encodeURIComponent(window.location.href)
-      // window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${redirectUri}`
+      console.error('Lỗi khi lấy danh sách menu:', error)
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('userName')
+      window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
     } finally {
       setLoading(false)
     }

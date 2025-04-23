@@ -15,6 +15,7 @@ import {
 import axios from 'axios'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ConfirmDialog from '../components/ConfirmDialog'
+import AppConfig from '../config/AppConfig'
 
 const UserRolePage = () => {
   const location = useLocation()
@@ -34,16 +35,16 @@ const UserRolePage = () => {
     const fetchRoles = async () => {
       try {
         const [allRolesRes, userRolesRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/roles/get-all', {
+          axios.get(`${AppConfig.apiUrlBussiness}/api/roles/get-all`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
             },
           }),
           axios.get(
-            `http://localhost:8080/api/roles/get-role-by-user-id?userId=${userId}`,
+            `${AppConfig.apiUrlBussiness}/api/roles/get-role-by-user-id?userId=${userId}`,
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
               },
             }
           ),
@@ -79,14 +80,14 @@ const UserRolePage = () => {
   const handleSave = async () => {
     try {
       await axios.put(
-        'http://localhost:8080/api/roles/updateUserRole',
+        `${AppConfig.apiUrlBussiness}/api/roles/updateUserRole`,
         {
           userId,
           listRole: checkedRoles,
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
           },
         }
       )
