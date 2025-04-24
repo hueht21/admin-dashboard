@@ -31,9 +31,14 @@ import AppConfig from '../config/AppConfig'
 
 import AxiosInstance from '../config/AxiosInstance'
 
+import { useAuth } from '../context/AuthContext';
+
 const drawerWidth = 240
 
 const DashboardLayout = () => {
+
+  // const { menus, isMenuLoaded } = useAuth();
+
   const [user, setUser] = useState({
     id: 0,
     userName: '',
@@ -41,7 +46,7 @@ const DashboardLayout = () => {
   })
   const location = useLocation()
   const navigate = useNavigate()
-  const [listMenu, setListMenu] = useState([])
+  // const [listMenu, setListMenu] = useState([])
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -54,78 +59,80 @@ const DashboardLayout = () => {
     })
   }
 
-  useEffect(() => {
-    fetchMenus()
-  }, [])
+  // useEffect(() => {
+  //   console.log('Menus trong DashboardLayout:', menus);
+  // }, [menus]);
 
-  const fetchMenus = async () => {
-    const queryParams = new URLSearchParams(window.location.search)
-    const tokenFromUrl = queryParams.get('access_token')
-    var userName = queryParams.get('userName')
 
-    setIsLoading(true)
-    if (tokenFromUrl) {
-      // B2: Lưu token vào localStorage
-      console.log('B2: Lưu token vào localStorage')
-      localStorage.setItem('access_token', tokenFromUrl)
-    }
+  // const fetchMenus = async () => {
+  //   const queryParams = new URLSearchParams(window.location.search)
+  //   const tokenFromUrl = queryParams.get('access_token')
+  //   var userName = queryParams.get('userName')
 
-    if (userName) {
-      localStorage.setItem('userName', userName)
-      // window.history.replaceState(null, '', '/dashboard')
-    } else {
-      userName = localStorage.getItem('userName')
-    }
+  //   setIsLoading(true)
+  //   if (tokenFromUrl) {
+  //     // B2: Lưu token vào localStorage
+  //     console.log('B2: Lưu token vào localStorage')
+  //     localStorage.setItem('access_token', tokenFromUrl)
+  //   }
 
-    // B4: Lấy token đã lưu
-    const savedToken = localStorage.getItem('access_token')
+  //   if (userName) {
+  //     localStorage.setItem('userName', userName)
+  //     // window.history.replaceState(null, '', '/dashboard')
+  //   } else {
+  //     userName = localStorage.getItem('userName')
+  //   }
 
-    if (!savedToken || !userName) {
-      console.log('Không có token trong localStorage')
-      // Nếu vẫn không có token, redirect sang Auth Server login
-      const redirectUri = encodeURIComponent(window.location.href)
-      window.location.href = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${redirectUri}`
-    } else {
-      // B5: Gọi API backend domain1.com để lấy dữ liệu
-      console.log('B5: Gọi API backend domain1.com để lấy dữ liệu')
-      console.log('userName:', userName)
-      AxiosInstance.get(
-        `${AppConfig.apiUrlBussiness}/api/home-page/dashboard?userName=${userName}`
-      )
-        .then((res) => {
-          // setUserData(res.data)
-          console.log('dữ liệu từ API:', res.data.data)
-          setListMenu(res.data.data.listMenu)
-          setUser({
-            id: res.data.data.id,
-            userName: res.data.data.userName,
-            nameUser: res.data.data.nameUser,
-          })
-          localStorage.setItem(
-            'user_local',
-            JSON.stringify({
-              id: res.data.data.id,
-              userName: res.data.data.userName,
-              nameUser: res.data.data.nameUser,
-            })
-          )
-        })
-        .catch((err) => {
-          console.error('Lỗi xác thực:', err)
-        })
-        .finally(() => {
-          console.log('Đã gọi API xong')
-          setIsLoading(false)
-          window.history.replaceState(null, '', '/dashboard')
-        })
-    }
-  }
+  //   // B4: Lấy token đã lưu
+  //   const savedToken = localStorage.getItem('access_token')
+
+  //   if (!savedToken || !userName) {
+  //     console.log('Không có token trong localStorage')
+  //     // Nếu vẫn không có token, redirect sang Auth Server login
+  //     const redirectUri = encodeURIComponent(window.location.href)
+  //     window.location.href = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${redirectUri}`
+  //   } else {
+  //     // B5: Gọi API backend domain1.com để lấy dữ liệu
+  //     console.log('B5: Gọi API backend domain1.com để lấy dữ liệu')
+  //     console.log('userName:', userName)
+  //     AxiosInstance.get(
+  //       `${AppConfig.apiUrlBussiness}/api/home-page/dashboard?userName=${userName}`
+  //     )
+  //       .then((res) => {
+  //         // setUserData(res.data)
+  //         console.log('dữ liệu từ API:', res.data.data)
+  //         setListMenu(res.data.data.listMenu)
+  //         setUser({
+  //           id: res.data.data.id,
+  //           userName: res.data.data.userName,
+  //           nameUser: res.data.data.nameUser,
+  //         })
+  //         localStorage.setItem(
+  //           'user_local',
+  //           JSON.stringify({
+  //             id: res.data.data.id,
+  //             userName: res.data.data.userName,
+  //             nameUser: res.data.data.nameUser,
+  //           })
+  //         )
+  //       })
+  //       .catch((err) => {
+  //         console.error('Lỗi xác thực:', err)
+  //       })
+  //       .finally(() => {
+  //         console.log('Đã gọi API xong')
+  //         setIsLoading(false)
+  //         window.history.replaceState(null, '', '/dashboard')
+  //       })
+  //   }
+  // }
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenus, setOpenMenus] = useState({}) // để mở/tắt menu cha
 
+  const { menus, isMenuLoaded } = useAuth();
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
@@ -138,106 +145,55 @@ const DashboardLayout = () => {
     setOpenMenus((prev) => ({ ...prev, [groupName]: !prev[groupName] }))
   }
 
-  const groupMenus = (menus) => {
-    return [
-      {
-        groupName: 'Quản lý hệ thống',
-        icon: <AdminPanelSettingsIcon />,
-        children: menus.filter((menu) =>
-          ['/roles', '/menus', '/accounts', '/user-manager'].includes(
-            menu.menuUrl
-          )
-        ),
-      },
-      {
-        groupName: 'Quản lý dịch vụ',
-        icon: <MiscellaneousServicesIcon />,
-        children: menus.filter((menu) =>
-          ['/categories', '/orders', '/customers', '/oder-cus'].includes(
-            menu.menuUrl
-          )
-        ),
-      },
-      {
-        groupName: 'Khác',
-        icon: <DashboardCustomizeIcon />,
-        children: menus.filter(
-          (menu) =>
-            ![
-              '/roles',
-              '/menus',
-              '/accounts',
-              '/user-manager',
-              '/categories',
-              '/orders',
-              '/customers',
-              '/oder-cus',
-            ].includes(menu.menuUrl)
-        ),
-      },
-    ]
-  }
+  // const groupMenus = (menus) => {
+  //   return [
+  //     {
+  //       groupName: 'Quản lý hệ thống',
+  //       icon: <AdminPanelSettingsIcon />,
+  //       children: menus.filter((menu) =>
+  //         ['/roles', '/menus', '/accounts', '/user-manager'].includes(
+  //           menu.menuUrl
+  //         )
+  //       ),
+  //     },
+  //     {
+  //       groupName: 'Quản lý dịch vụ',
+  //       icon: <MiscellaneousServicesIcon />,
+  //       children: menus.filter((menu) =>
+  //         ['/categories', '/orders', '/customers', '/oder-cus'].includes(
+  //           menu.menuUrl
+  //         )
+  //       ),
+  //     },
+  //     {
+  //       groupName: 'Khác',
+  //       icon: <DashboardCustomizeIcon />,
+  //       children: menus.filter(
+  //         (menu) =>
+  //           ![
+  //             '/roles',
+  //             '/menus',
+  //             '/accounts',
+  //             '/user-manager',
+  //             '/categories',
+  //             '/orders',
+  //             '/customers',
+  //             '/oder-cus',
+  //           ].includes(menu.menuUrl)
+  //       ),
+  //     },
+  //   ]
+  // }
 
-  const groupedMenu = groupMenus(listMenu)
+  // const groupedMenu = groupMenus(listMenu)
 
-  const drawerContent = (
-    <>
-      <Toolbar />
-      <Divider />
-      <List>
-        {groupedMenu.map((group, idx) =>
-          group.children.length > 0 ? (
-            <Box key={idx}>
-              <ListItemButton
-                onClick={() => handleToggleGroup(group.groupName)}
-              >
-                {group.icon && <Box sx={{ mr: 1 }}>{group.icon}</Box>}
-                <ListItemText
-                  primary={group.groupName}
-                  sx={{ fontWeight: 'bold' }}
-                />
-                {openMenus[group.groupName] ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-              <Collapse
-                in={openMenus[group.groupName]}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  {group.children.map((menu) => (
-                    <ListItem key={menu.id} disablePadding sx={{ pl: 4 }}>
-                      <ListItemButton
-                        onClick={() => handleMenuClick(menu.menuUrl)}
-                        selected={location.pathname.startsWith(
-                          `/dashboard${menu.menuUrl}`
-                        )}
-                        sx={{
-                          '&.Mui-selected': {
-                            backgroundColor: '#1976d2',
-                            color: '#fff',
-                          },
-                          '&.Mui-selected:hover': {
-                            backgroundColor: '#1976d2',
-                          },
-                          '&:hover': {
-                            backgroundColor: '#e3f2fd',
-                          },
-                        }}
-                      >
-                        <ListItemText primary={menu.menuName} />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              </Collapse>
-            </Box>
-          ) : null
-        )}
-      </List>
-    </>
-  )
+  // if (!isMenuLoaded) {
+  //   return <div>Đang tải...</div>;
+  // }
 
-  if (isLoading) {
+
+
+  if (!isMenuLoaded) {
     return (
       <Box
         display="flex"
@@ -249,6 +205,38 @@ const DashboardLayout = () => {
       </Box>
     )
   } else {
+
+    const drawerContent = (
+      <>
+        <Toolbar />
+        <Divider />
+        <List>
+          {menus.map((menu) => (
+            <ListItem key={menu.id} disablePadding>
+              <ListItemButton
+                onClick={() => handleMenuClick(menu.menuUrl)}
+                selected={location.pathname.startsWith(`/dashboard${menu.menuUrl}`)}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: '#1976d2',
+                    color: '#fff',
+                  },
+                  '&.Mui-selected:hover': {
+                    backgroundColor: '#1976d2',
+                  },
+                  '&:hover': {
+                    backgroundColor: '#e3f2fd',
+                  },
+                }}
+              >
+                <ListItemText primary={menu.menuName} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </>
+    );
+
     return (
       <Box sx={{ display: 'flex' }}>
         <AppBar position="fixed" sx={{ zIndex: 1201 }}>
