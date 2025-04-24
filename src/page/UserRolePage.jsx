@@ -12,10 +12,10 @@ import {
   CircularProgress,
   IconButton,
 } from '@mui/material'
-import axios from 'axios'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ConfirmDialog from '../components/ConfirmDialog'
 import AppConfig from '../config/AppConfig'
+import AxiosInstance from '../config/AxiosInstance'
 
 const UserRolePage = () => {
   const location = useLocation()
@@ -35,30 +35,15 @@ const UserRolePage = () => {
     const fetchRoles = async () => {
       try {
         const [allRolesRes, userRolesRes] = await Promise.all([
-          axios.get(`${AppConfig.apiUrlBussiness}/api/roles/get-all`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-            },
-          }),
-          axios.get(
-            `${AppConfig.apiUrlBussiness}/api/roles/get-role-by-user-id?userId=${userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-              },
-            }
+          AxiosInstance.get(`${AppConfig.apiUrlBussiness}/api/roles/get-all`),
+          AxiosInstance.get(
+            `${AppConfig.apiUrlBussiness}/api/roles/get-role-by-user-id?userId=${userId}`
           ),
         ])
         setRoles(allRolesRes.data.data)
         setCheckedRoles(userRolesRes.data.data.map((role) => role.idRole))
       } catch (error) {
         console.error('Lỗi khi tải role:', error)
-        if (
-          error.response &&
-          (error.response.status === 401 || error.response.status === 403)
-        ) {
-          navigate('/login')
-        }
       } finally {
         setLoading(false)
       }
@@ -79,16 +64,11 @@ const UserRolePage = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(
+      await AxiosInstance.put(
         `${AppConfig.apiUrlBussiness}/api/roles/updateUserRole`,
         {
           userId,
           listRole: checkedRoles,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-          },
         }
       )
       alert('Cập nhật quyền người dùng thành công!')

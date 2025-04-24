@@ -23,13 +23,14 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
-import { useAuth } from '../context/AuthContext'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices'
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 
-import axios from 'axios'
 import AppConfig from '../config/AppConfig'
+
+import AxiosInstance from '../config/AxiosInstance'
+
 const drawerWidth = 240
 
 const DashboardLayout = () => {
@@ -42,24 +43,27 @@ const DashboardLayout = () => {
   const navigate = useNavigate()
   const [listMenu, setListMenu] = useState([])
 
-  const { logout } = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
+
   console.log('Dashboard render', location.pathname)
   const handleLogout = () => {
-    logout()
-    navigate('/login')
+    AxiosInstance.post(`${AppConfig.urlAuthWeb}/api/logout`).then((res) => {
+      if (res.data.status) {
+        window.location.href = `${AppConfig.urlWebBusssiness}/home`
+      }
+    })
   }
 
-  const [loading, setLoading] = useState(false)
   useEffect(() => {
     fetchMenus()
   }, [])
 
   const fetchMenus = async () => {
-    setLoading(true)
     const queryParams = new URLSearchParams(window.location.search)
     const tokenFromUrl = queryParams.get('access_token')
     var userName = queryParams.get('userName')
 
+    setIsLoading(true)
     if (tokenFromUrl) {
       // B2: Lưu token vào localStorage
       console.log('B2: Lưu token vào localStorage')
@@ -68,7 +72,7 @@ const DashboardLayout = () => {
 
     if (userName) {
       localStorage.setItem('userName', userName)
-      window.history.replaceState(null, '', '/dashboard')
+      // window.history.replaceState(null, '', '/dashboard')
     } else {
       userName = localStorage.getItem('userName')
     }
@@ -80,20 +84,14 @@ const DashboardLayout = () => {
       console.log('Không có token trong localStorage')
       // Nếu vẫn không có token, redirect sang Auth Server login
       const redirectUri = encodeURIComponent(window.location.href)
-      window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${redirectUri}`
+      window.location.href = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${redirectUri}`
     } else {
       // B5: Gọi API backend domain1.com để lấy dữ liệu
       console.log('B5: Gọi API backend domain1.com để lấy dữ liệu')
       console.log('userName:', userName)
-      axios
-        .get(
-          `${AppConfig.apiUrlBussiness}/api/home-page/dashboard?userName=${userName}`,
-          {
-            headers: {
-              Authorization: `Bearer ${savedToken}`,
-            },
-          }
-        )
+      AxiosInstance.get(
+        `${AppConfig.apiUrlBussiness}/api/home-page/dashboard?userName=${userName}`
+      )
         .then((res) => {
           // setUserData(res.data)
           console.log('dữ liệu từ API:', res.data.data)
@@ -103,20 +101,22 @@ const DashboardLayout = () => {
             userName: res.data.data.userName,
             nameUser: res.data.data.nameUser,
           })
+          localStorage.setItem(
+            'user_local',
+            JSON.stringify({
+              id: res.data.data.id,
+              userName: res.data.data.userName,
+              nameUser: res.data.data.nameUser,
+            })
+          )
         })
         .catch((err) => {
           console.error('Lỗi xác thực:', err)
-          // Token sai hoặc hết hạn => Xoá và redirect lại login
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('userName')
-          const redirectUri = encodeURIComponent(window.location.href)
-          window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${redirectUri}`
         })
         .finally(() => {
           console.log('Đã gọi API xong')
-          setLoading(false)
-          // B3: Xoá access_token khỏi URL để đường dẫn đẹp
-          // window.history.replaceState(null, '', '/dashboard')
+          setIsLoading(false)
+          window.history.replaceState(null, '', '/dashboard')
         })
     }
   }
@@ -237,9 +237,14 @@ const DashboardLayout = () => {
     </>
   )
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     )

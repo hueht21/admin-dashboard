@@ -1,14 +1,5 @@
-// import React from 'react'
-
-// const MenuPage = () => {
-//   return <div>Quản lý menu</div>
-// }
-
-// export default MenuPage
-
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-// import { useNavigate } from 'react-router-dom'
+
 import {
   Box,
   Typography,
@@ -18,11 +9,12 @@ import {
   Button,
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-// import EditIcon from '@mui/icons-material/Edit'
-// import DeleteIcon from '@mui/icons-material/Delete'
+
 import DialogThemMenu from '../page/dialog/DialogThemMenu'
 import CustomSnackbar from '../components/CustomSnackbar'
 import AppConfig from '../config/AppConfig'
+
+import AxiosInstance from '../config/AxiosInstance'
 
 const MenuPage = () => {
   const [menu, setMenu] = useState([])
@@ -47,20 +39,15 @@ const MenuPage = () => {
   const handleAddMenu = async (menu) => {
     setLoading(true)
     try {
-      const user = JSON.parse(localStorage.getItem('user'))
+      const user = JSON.parse(localStorage.getItem('user_local'))
       const userId = user?.id
 
-      const response = await axios.post(
+      const response = await AxiosInstance.post(
         `${AppConfig.apiUrlBussiness}/api/menus/save-menu`,
         {
           nameMenu: menu.menuName,
           linkUri: menu.menuUrl,
           userCreate: userId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-          },
         }
       )
 
@@ -86,24 +73,16 @@ const MenuPage = () => {
   }, [])
 
   const fetchMenus = async () => {
-    const token = localStorage.getItem('access_token')
     try {
-      const response = await axios.get(
-        `${AppConfig.apiUrlBussiness}/api/menus/get-all-menus`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await AxiosInstance.get(
+        `${AppConfig.apiUrlBussiness}/api/menus/get-all-menus`
       )
       if (response.data.status) {
         setMenu(response.data.data)
       }
     } catch (error) {
       console.error('Lỗi khi lấy danh sách menu:', error)
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('userName')
-      window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
+      setLoading(false)
     } finally {
       setLoading(false)
     }

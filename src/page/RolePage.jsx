@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -11,6 +10,7 @@ import {
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
 import AppConfig from '../config/AppConfig'
+import AxiosInstance from '../config/AxiosInstance'
 
 const RoleList = () => {
   const [roles, setRoles] = useState([])
@@ -19,27 +19,15 @@ const RoleList = () => {
 
   useEffect(() => {
     const fetchRoles = async () => {
-      const token = localStorage.getItem('access_token')
       try {
-        const response = await axios.get(
-          `${AppConfig.apiUrlBussiness}/api/roles/get-all`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await AxiosInstance.get(
+          `${AppConfig.apiUrlBussiness}/api/roles/get-all`
         )
         if (response.data.status) {
           setRoles(response.data.data)
         }
       } catch (error) {
         console.error('Lỗi khi lấy danh sách role:', error)
-        // if (
-        //   error.response &&
-        //   (error.response.status === 401 || error.response.status === 403)
-        // ) {
-        //   navigate('/login')
-        // }
       } finally {
         setLoading(false)
       }

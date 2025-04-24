@@ -16,6 +16,7 @@ import {
   UserManagerPage,
   UserRolePage,
   HomePage,
+  ForbiddenPage,
 } from './page'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
 
         <Route path="/home" element={<HomePage />} />
+        <Route path="/403" element={<ForbiddenPage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route>
             <Route path="accounts" element={<Accounts />} />

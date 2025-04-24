@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import axios from 'axios'
-// import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -18,6 +16,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import UserStatusCell from '../components/UserStatusCell'
 import CustomSnackbar from '../components/CustomSnackbar'
 import AppConfig from '../config/AppConfig'
+import axiosInstance from '../config/AxiosInstance'
 
 const UserManagerPage = () => {
   const navigate = useNavigate()
@@ -46,7 +45,7 @@ const UserManagerPage = () => {
   const fetchUser = async () => {
     const token = localStorage.getItem('access_token')
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${AppConfig.apiUrlBussiness}/api/v1/user/getAllUser`,
         {
           headers: {
@@ -80,7 +79,7 @@ const UserManagerPage = () => {
     )
 
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `${AppConfig.apiUrlBussiness}/api/roles/lock-account`,
         { userId: idUser, status: status },
 

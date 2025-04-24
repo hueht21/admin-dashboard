@@ -21,7 +21,7 @@ const HomePage = () => {
     // navigate('/login')
 
     // Redirect về auth
-    window.location.href = `${AppConfig.urlAuthWeb}/login?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
+    window.location.href = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
   }
 
   return (
