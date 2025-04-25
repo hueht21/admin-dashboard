@@ -23,15 +23,20 @@ axiosInstance.interceptors.response.use(
   (error) => {
     const status = error?.response?.status
 
-    if (status === 401) {
-      // Xóa token và chuyển hướng đến trang login
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('userName')
+    const currentPath = window.location.pathname
 
-      const redirectUrl = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
-      window.location.href = redirectUrl
-    } else if (status === 403) {
-      window.location.href = `${AppConfig.urlWebBusssiness}/403`
+    // Nếu KHÔNG phải /home thì mới redirect
+    if (currentPath !== '/home') {
+      if (status === 401) {
+        // nếu là về trang home thì không cần chuyển sang login
+        // Xóa token và chuyển hướng đến trang login
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('userName')
+        const redirectUrl = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
+        window.location.href = redirectUrl
+      } else if (status === 403) {
+        window.location.href = `${AppConfig.urlWebBusssiness}/403`
+      }
     }
 
     return Promise.reject(error) // vẫn trả lỗi để xử lý riêng nếu cần
