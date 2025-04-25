@@ -29,8 +29,6 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 
 import AppConfig from '../config/AppConfig'
 
-import AxiosInstance from '../config/AxiosInstance'
-
 import { useAuth } from '../context/AuthContext'
 
 const drawerWidth = 240

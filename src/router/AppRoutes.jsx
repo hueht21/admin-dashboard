@@ -1,6 +1,5 @@
 // src/routes/AppRoutes.js
 import { Routes, Route, Navigate } from 'react-router-dom'
-import ProtectedRoute from './ProtectedRoute'
 import { useAuth } from '../context/AuthContext'
 
 import DashboardLayout from '../page/Dashboard'
@@ -12,7 +11,6 @@ import HomePage from '../page/HomePage'
 import menuPageMap from './menuPageMap'
 
 import RoleDetail from '../page/RoleDetail'
-import UserManagerPage from '../page/UserManagerPage'
 import UserRolePage from '../page/UserRolePage'
 
 const AppRoutes = () => {
