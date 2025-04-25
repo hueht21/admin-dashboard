@@ -12,9 +12,9 @@ import {
   CircularProgress,
   IconButton,
 } from '@mui/material'
-import axios from 'axios'
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack' // Import mũi tên
-import { useAuth } from '../context/AuthContext'
+
 import AppConfig from '../config/AppConfig'
 import AxiosInstance from '../config/AxiosInstance'
 
@@ -27,12 +27,6 @@ const RoleDetail = () => {
   const [menus, setMenus] = useState([])
   const [checkedMenus, setCheckedMenus] = useState([])
   const [loading, setLoading] = useState(true)
-
-  const { logout } = useAuth()
-  // const handleLogout = () => {
-  //   logout()
-  //   navigate('/login')
-  // }
 
   useEffect(() => {
     const fetchMenus = async () => {
