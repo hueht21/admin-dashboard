@@ -3,8 +3,8 @@ import React from 'react'
 const ForbiddenPage = () => {
   return (
     <div style={{ textAlign: 'center', padding: '100px' }}>
-      <h1>403 - Forbidden</h1>
-      <p>Bạn không có quyền truy cập trang này.</p>
+      <h1>404 - Page Not Found</h1>
+      <p>Đường dẫn không tồn tại hoặc bạn không có quyền truy cập.</p>
     </div>
   )
 }
