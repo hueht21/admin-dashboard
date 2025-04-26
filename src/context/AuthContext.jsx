@@ -12,6 +12,11 @@ export const AuthProvider = ({ children }) => {
   const [isMenuLoaded, setIsMenuLoaded] = useState(false)
 
   useEffect(() => {
+    const currentPath = window.location.pathname
+
+    // ✅ Ngăn vòng lặp nếu đang ở /403
+    if (currentPath === '/403') return
+
     // 1. Lấy token từ URL (nếu có)
     const params = new URLSearchParams(window.location.search)
     const tokenFromUrl = params.get('access_token')

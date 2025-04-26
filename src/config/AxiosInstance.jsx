@@ -1,6 +1,6 @@
 // axiosInstance.js
 import axios from 'axios'
-import AppConfig from './AppConfig' // Nhớ điều chỉnh đường dẫn phù hợp
+import AppConfig from './AppConfig'
 
 const axiosInstance = axios.create()
 

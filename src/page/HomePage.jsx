@@ -21,6 +21,10 @@ const HomePage = () => {
     // navigate('/login')
 
     // Redirect về auth
+    window.location.href = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard&pre_action=login`
+  }
+
+  const handleStart = () => {
     window.location.href = `${AppConfig.urlAuthWeb}/login-auth-web?redirect_uri=${AppConfig.urlWebBusssiness}/dashboard`
   }
 
@@ -235,7 +239,7 @@ const HomePage = () => {
                       textTransform: 'none',
                       '&:hover': { bgcolor: '#4338CA' },
                     }}
-                    onClick={handleLoginPage}
+                    onClick={handleStart}
                   >
                     Bắt đầu!
                   </Button>
